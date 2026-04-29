@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>שליטה על המחשב</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        // הגדרות החיבור שלך מ-Firebase (העתק מה-Console)
+        const firebaseConfig = {
+            databaseURL: "https://pc-wifi-default-rtdb.firebaseio.com/" // <-- שים כאן את הקישור האמיתי שלך מ-Firebase!
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const statusRef = ref(db, 'is_blocked');
+
+        const button = document.getElementById('toggleBtn');
+        let currentState = false;
+
+        // האזנה למצב הנוכחי כדי לעדכן את הכפתור
+        onValue(statusRef, (snapshot) => {
+            currentState = snapshot.val();
+            if(currentState) {
+                button.textContent = "שחרר אינטרנט במחשב 🌐";
+                button.style.backgroundColor = "#4CAF50";
+            } else {
+                button.textContent = "חסום אינטרנט במחשב 🔒";
+                button.style.backgroundColor = "#f44336";
+            }
+        });
+
+        // שינוי המצב בלחיצה
+        button.onclick = () => {
+            set(statusRef, !currentState);
+        };
+    </script>
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #121212; font-family: system-ui; }
+        button { padding: 30px 40px; font-size: 24px; font-weight: bold; border: none; border-radius: 15px; color: white; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <button id="toggleBtn">טוען נתונים...</button>
+</body>
+</html>
